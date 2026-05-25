@@ -1,0 +1,33 @@
+name: Build APK
+
+# Run this build whenever code is pushed, or when started manually
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build the APK with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          command: buildozer android debug
+          buildozer_version: stable
+
+      - name: Upload the finished APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: goodwill-apk
+          path: ${{ steps.buildozer.outputs.filename }}
